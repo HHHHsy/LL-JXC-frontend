@@ -105,12 +105,17 @@
               <el-input-number v-model="row.quantity" :min="1" />
             </template>
           </el-table-column>
-          <el-table-column label="成本价" width="180">
+          <el-table-column label="成本价" width="150">
             <template #default="{ row }">
               <el-input-number v-model="row.costPrice" :min="0" :precision="2" />
             </template>
           </el-table-column>
-          <el-table-column label="操作">
+          <el-table-column label="备注（型号/车型）" min-width="150">
+            <template #default="{ row }">
+              <el-input v-model="row.remark" placeholder="如：参考适合车型" maxlength="50" />
+            </template>
+          </el-table-column>
+          <el-table-column label="操作" width="80">
             <template #default="{ $index }">
               <el-button type="danger" size="small" @click="handleRemoveDetail($index)">删除</el-button>
             </template>
@@ -393,7 +398,8 @@ async function handleEdit(row) {
         id: d.id,
         productId: d.productId,
         quantity: d.quantity,
-        costPrice: d.costPrice
+        costPrice: d.costPrice,
+        remark: d.remark || ''
       }))
       formRef.value?.clearValidate()
       dialogVisible.value = true
@@ -424,7 +430,7 @@ function handleDialogClose() {
 }
 
 function handleAddDetail() {
-  details.value.push({ productId: '', quantity: 1, costPrice: 0 })
+  details.value.push({ productId: '', quantity: 1, costPrice: 0, remark: '' })
 }
 
 function handleRemoveDetail(index) {
@@ -456,9 +462,11 @@ async function handleSubmit() {
       status: '待入库'
     },
     details: details.value.map(d => ({
+      id: d.id,
       productId: d.productId,
       quantity: d.quantity,
-      costPrice: d.costPrice
+      costPrice: d.costPrice,
+      remark: d.remark
     }))
   }
   submitting.value = true

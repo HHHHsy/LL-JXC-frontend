@@ -51,11 +51,12 @@
             <el-tag :type="statusTagType(row.status)">{{ row.status }}</el-tag>
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="330">
+        <el-table-column label="操作" width="410">
           <template #default="{ row }">
             <el-button v-if="row.status === '待出库'" type="primary" size="small" @click="handleEdit(row)">编辑</el-button>
             <el-button v-if="row.status === '待出库'" type="warning" size="small" @click="handleCancel(row)">取消订单</el-button>
             <el-button v-if="row.status === '待出库' || row.status === '已取消'" type="danger" size="small" @click="handleDelete(row)">删除</el-button>
+            <el-button type="success" size="small" @click="handleDeliveryNote(row)">送货单</el-button>
             <el-button type="info" size="small" @click="handleDetail(row)">查看详情</el-button>
           </template>
         </el-table-column>
@@ -92,24 +93,29 @@
           <el-button type="primary" size="small" @click="handleAddDetail">添加明细</el-button>
         </div>
         <el-table :data="details" border>
-          <el-table-column label="商品" width="220">
+          <el-table-column label="商品" width="200">
             <template #default="{ row }">
               <el-select v-model="row.productId" placeholder="请选择商品" filterable>
                 <el-option v-for="p in productOptions" :key="p.id" :label="p.name" :value="p.id" />
               </el-select>
             </template>
           </el-table-column>
-          <el-table-column label="数量" width="180">
+          <el-table-column label="数量" width="140">
             <template #default="{ row }">
               <el-input-number v-model="row.quantity" :min="1" />
             </template>
           </el-table-column>
-          <el-table-column label="销售价" width="180">
+          <el-table-column label="销售价" width="150">
             <template #default="{ row }">
               <el-input-number v-model="row.salePrice" :min="0" :precision="2" />
             </template>
           </el-table-column>
-          <el-table-column label="操作">
+          <el-table-column label="备注（打印在送货单上）" min-width="150">
+            <template #default="{ row }">
+              <el-input v-model="row.remark" placeholder="如：正装" maxlength="50" />
+            </template>
+          </el-table-column>
+          <el-table-column label="操作" width="80">
             <template #default="{ $index }">
               <el-button type="danger" size="small" @click="handleRemoveDetail($index)">删除</el-button>
             </template>
@@ -122,6 +128,9 @@
         <el-button type="primary" @click="handleSubmit" :loading="submitting">确定</el-button>
       </template>
     </el-dialog>
+
+    <!-- 送货单打印 -->
+    <DeliveryNoteDialog v-model="deliveryNoteVisible" :order-id="deliveryNoteOrderId" />
 
     <!-- 查看详情弹窗 -->
     <el-dialog title="订单详情" v-model="detailVisible" width="700px">
@@ -138,6 +147,7 @@
         <el-table-column prop="quantity" label="数量" />
         <el-table-column prop="shippedQuantity" label="已出库数量" />
         <el-table-column prop="salePrice" label="销售价" />
+        <el-table-column prop="remark" label="备注" />
         <el-table-column label="小计">
           <template #default="{ row }">
             {{ (row.quantity * row.salePrice).toFixed(2) }}
@@ -161,6 +171,7 @@ import {
 } from '../../api/saleOrder'
 import { listCustomerAll } from '../../api/customer'
 import { listProductAll } from '../../api/product'
+import DeliveryNoteDialog from '../../components/DeliveryNoteDialog.vue'
 
 const searchForm = reactive({
   orderNo: '',
@@ -198,6 +209,15 @@ const editId = ref(null)
 const detailVisible = ref(false)
 const detailOrder = reactive({})
 const detailDetails = ref([])
+
+/* ---------------- 送货单打印 ---------------- */
+const deliveryNoteVisible = ref(false)
+const deliveryNoteOrderId = ref(null)
+
+function handleDeliveryNote(row) {
+  deliveryNoteOrderId.value = row.id
+  deliveryNoteVisible.value = true
+}
 
 onMounted(() => {
   fetchData()
@@ -294,7 +314,8 @@ async function handleEdit(row) {
         id: d.id,
         productId: d.productId,
         quantity: d.quantity,
-        salePrice: d.salePrice
+        salePrice: d.salePrice,
+        remark: d.remark || ''
       }))
       formRef.value?.clearValidate()
       dialogVisible.value = true
@@ -325,7 +346,7 @@ function handleDialogClose() {
 }
 
 function handleAddDetail() {
-  details.value.push({ productId: '', quantity: 1, salePrice: 0 })
+  details.value.push({ productId: '', quantity: 1, salePrice: 0, remark: '' })
 }
 
 function handleRemoveDetail(index) {
@@ -357,9 +378,11 @@ async function handleSubmit() {
       status: '待出库'
     },
     details: details.value.map(d => ({
+      id: d.id,
       productId: d.productId,
       quantity: d.quantity,
-      salePrice: d.salePrice
+      salePrice: d.salePrice,
+      remark: d.remark
     }))
   }
   submitting.value = true

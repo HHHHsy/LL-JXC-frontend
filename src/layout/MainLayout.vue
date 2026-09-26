@@ -64,6 +64,14 @@
           <el-menu-item index="/purchase-report">采购明细表</el-menu-item>
           <el-menu-item index="/sale-report">销售明细表</el-menu-item>
         </el-sub-menu>
+
+        <el-sub-menu index="6">
+          <template #title>
+            <el-icon><Setting /></el-icon>
+            <span>系统管理</span>
+          </template>
+          <el-menu-item index="/settings">系统设置</el-menu-item>
+        </el-sub-menu>
       </el-menu>
     </el-aside>
 

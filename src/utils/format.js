@@ -17,3 +17,11 @@ export function formatAmount(value) {
   if (!Number.isFinite(num)) return '0.00'
   return num.toFixed(2)
 }
+
+/** 日期格式化为 2026/9/15（送货单等纸质单据习惯写法） */
+export function formatDateSlash(value) {
+  if (!value) return ''
+  const parts = String(value).slice(0, 10).split('-')
+  if (parts.length !== 3) return String(value)
+  return `${parts[0]}/${Number(parts[1])}/${Number(parts[2])}`
+}

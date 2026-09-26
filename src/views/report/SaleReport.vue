@@ -18,6 +18,14 @@
             <el-option v-for="c in customerOptions" :key="c.id" :label="c.name" :value="c.id" />
           </el-select>
         </el-form-item>
+        <el-form-item label="订单状态">
+          <el-select v-model="searchForm.status" placeholder="全部（不含已取消）" clearable style="width: 170px">
+            <el-option label="全部（不含已取消）" value="" />
+            <el-option label="待出库" value="待出库" />
+            <el-option label="部分出库" value="部分出库" />
+            <el-option label="已出库" value="已出库" />
+          </el-select>
+        </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="handleSearch">查询</el-button>
           <el-button @click="handleReset">重置</el-button>
@@ -63,7 +71,8 @@ import { formatAmount } from '../../utils/format'
 
 const searchForm = reactive({
   dateRange: null,
-  customerId: ''
+  customerId: '',
+  status: ''
 })
 
 const customerOptions = ref([])
@@ -96,6 +105,7 @@ async function fetchData() {
   try {
     const params = { pageNum: pageNum.value, pageSize: pageSize.value }
     if (searchForm.customerId) params.customerId = searchForm.customerId
+    if (searchForm.status) params.status = searchForm.status
     if (searchForm.dateRange && searchForm.dateRange.length === 2) {
       params.startDate = searchForm.dateRange[0]
       params.endDate = searchForm.dateRange[1]
@@ -120,6 +130,7 @@ function handleSearch() {
 function handleReset() {
   searchForm.dateRange = null
   searchForm.customerId = ''
+  searchForm.status = ''
   pageNum.value = 1
   fetchData()
 }

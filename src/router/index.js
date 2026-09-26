@@ -27,6 +27,7 @@ const routes = [
       { path: 'inventory-check', name: 'InventoryCheck', component: () => import('../views/inventory/InventoryCheck.vue'), meta: { title: '库存盘点' } },
       { path: 'purchase-report', name: 'PurchaseReport', component: () => import('../views/report/PurchaseReport.vue'), meta: { title: '采购明细表' } },
       { path: 'sale-report', name: 'SaleReport', component: () => import('../views/report/SaleReport.vue'), meta: { title: '销售明细表' } },
+      { path: 'settings', name: 'Settings', component: () => import('../views/system/Settings.vue'), meta: { title: '系统设置' } },
     ]
   }
 ]
