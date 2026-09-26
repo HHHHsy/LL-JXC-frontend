@@ -1,0 +1,11 @@
+import request from '../utils/request'
+export const listPurchaseOrder = (params) => request.get('/purchase-order/list', { params })
+export const getPurchaseOrder = (id) => request.get(`/purchase-order/${id}`)
+export const addPurchaseOrder = (data) => request.post('/purchase-order', data)
+export const updatePurchaseOrder = (data) => request.put('/purchase-order', data)
+export const deletePurchaseOrder = (id) => request.delete(`/purchase-order/${id}`)
+export const cancelPurchaseOrder = (id) => request.post(`/purchase-order/${id}/cancel`)
+export const receiveStock = (id, data) => request.post(`/purchase-order/${id}/receive`, data)
+export const previewPurchaseImport = (formData) => request.post('/purchase-order/import/preview', formData)
+export const importPurchaseOrder = (formData) => request.post('/purchase-order/import', formData)
+export const downloadPurchaseTemplate = () => request.get('/purchase-order/import/template', { responseType: 'blob' })
