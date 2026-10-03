@@ -7,7 +7,7 @@
           <el-input v-model="searchForm.orderNo" placeholder="订单编号" clearable />
         </el-form-item>
         <el-form-item label="供应商">
-          <el-select v-model="searchForm.supplierId" placeholder="请选择供应商" clearable>
+          <el-select v-model="searchForm.supplierId" placeholder="请选择供应商" clearable filterable @change="handleSearch">
             <el-option v-for="s in supplierOptions" :key="s.id" :label="s.name" :value="s.id" />
           </el-select>
         </el-form-item>
@@ -44,6 +44,7 @@
         <el-button type="success" @click="handleImportOpen">导入采购清单</el-button>
       </div>
       <el-table :data="tableData" border stripe v-loading="tableLoading">
+        <el-table-column type="index" label="序号" width="60" :index="i => (pageNum - 1) * pageSize + i + 1" />
         <el-table-column prop="orderNo" label="订单编号" />
         <el-table-column prop="supplierName" label="供应商名称" />
         <el-table-column prop="purchaseDate" label="采购日期" />

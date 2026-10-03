@@ -14,7 +14,7 @@
           />
         </el-form-item>
         <el-form-item label="供应商">
-          <el-select v-model="searchForm.supplierId" placeholder="请选择供应商" clearable>
+          <el-select v-model="searchForm.supplierId" placeholder="请选择供应商" clearable filterable @change="handleSearch">
             <el-option v-for="s in supplierOptions" :key="s.id" :label="s.name" :value="s.id" />
           </el-select>
         </el-form-item>
@@ -36,6 +36,7 @@
     <!-- 表格区（服务端分页，合计为全部查询结果） -->
     <el-card>
       <el-table :data="tableData" border stripe show-summary :summary-method="getSummaries" v-loading="tableLoading">
+        <el-table-column type="index" label="序号" width="60" :index="i => (pageNum - 1) * pageSize + i + 1" />
         <el-table-column prop="purchaseDate" label="采购日期" />
         <el-table-column prop="orderNo" label="采购单号" />
         <el-table-column prop="supplierName" label="供应商名称" />
@@ -149,6 +150,10 @@ function getSummaries(param) {
   const sums = []
   columns.forEach((column, index) => {
     if (index === 0) {
+      sums[index] = ''
+      return
+    }
+    if (index === 1) {
       sums[index] = '合计（全部查询结果）'
       return
     }

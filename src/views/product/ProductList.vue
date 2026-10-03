@@ -26,7 +26,7 @@
         <el-button type="success" @click="handleImportOpen">导入商品</el-button>
       </div>
       <el-table :data="tableData" border stripe v-loading="tableLoading">
-        <el-table-column prop="id" label="ID" width="60" />
+        <el-table-column type="index" label="序号" width="60" :index="i => (pageNum - 1) * pageSize + i + 1" />
         <el-table-column prop="code" label="商品编码" />
         <el-table-column prop="name" label="商品名称" />
         <el-table-column prop="category" label="商品分类" />

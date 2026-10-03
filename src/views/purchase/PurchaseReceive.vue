@@ -4,11 +4,34 @@
     <el-card style="margin-bottom: 16px">
       <el-form :inline="true" :model="searchForm">
         <el-form-item label="订单编号">
-          <el-input v-model="searchForm.orderNo" placeholder="订单编号" clearable />
+          <el-input
+            v-model="searchForm.orderNo"
+            placeholder="订单编号"
+            clearable
+            style="width: 200px"
+            @keyup.enter="handleSearch"
+            @clear="handleSearch"
+          />
         </el-form-item>
         <el-form-item label="供应商">
-          <el-select v-model="searchForm.supplierId" placeholder="请选择供应商" clearable>
+          <el-select
+            v-model="searchForm.supplierId"
+            placeholder="全部供应商"
+            clearable
+            filterable
+            style="width: 200px"
+            @change="handleSearch"
+          >
             <el-option v-for="s in supplierOptions" :key="s.id" :label="s.name" :value="s.id" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="状态">
+          <el-select v-model="searchForm.status" style="width: 130px" @change="handleSearch">
+            <el-option label="全部" value="ALL" />
+            <el-option label="待入库" value="待入库" />
+            <el-option label="部分入库" value="部分入库" />
+            <el-option label="已入库" value="已入库" />
+            <el-option label="已取消" value="已取消" />
           </el-select>
         </el-form-item>
         <el-form-item label="采购日期">
@@ -19,6 +42,8 @@
             start-placeholder="开始日期"
             end-placeholder="结束日期"
             value-format="YYYY-MM-DD"
+            style="width: 260px"
+            @change="handleSearch"
           />
         </el-form-item>
         <el-form-item>
@@ -31,6 +56,7 @@
     <!-- 表格区 -->
     <el-card>
       <el-table :data="tableData" border stripe v-loading="tableLoading">
+        <el-table-column type="index" label="序号" width="60" :index="i => (pageNum - 1) * pageSize + i + 1" />
         <el-table-column prop="orderNo" label="订单编号" />
         <el-table-column prop="supplierName" label="供应商名称" />
         <el-table-column prop="purchaseDate" label="采购日期" />
@@ -41,7 +67,12 @@
         </el-table-column>
         <el-table-column label="操作" width="150">
           <template #default="{ row }">
-            <el-button type="primary" size="small" @click="handleReceive(row)">入库</el-button>
+            <el-button
+              type="primary"
+              size="small"
+              :disabled="row.status === '已入库' || row.status === '已取消'"
+              @click="handleReceive(row)"
+            >入库</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -109,6 +140,7 @@ import { listSupplierAll } from '../../api/supplier'
 const searchForm = reactive({
   orderNo: '',
   supplierId: '',
+  status: 'ALL',
   dateRange: null
 })
 
@@ -145,8 +177,6 @@ async function fetchData() {
   tableLoading.value = true
   try {
     const params = { ...searchForm }
-    // 待入库 + 部分入库 的订单都可以继续入库
-    params.status = '待入库,部分入库'
     if (params.dateRange && params.dateRange.length === 2) {
       params.startDate = params.dateRange[0]
       params.endDate = params.dateRange[1]
@@ -154,6 +184,10 @@ async function fetchData() {
     delete params.dateRange
     if (!params.supplierId) {
       delete params.supplierId
+    }
+    // ALL = 查全部（历史单据），其余状态精确筛选
+    if (!params.status || params.status === 'ALL') {
+      delete params.status
     }
     params.pageNum = pageNum.value
     params.pageSize = pageSize.value
@@ -180,6 +214,7 @@ function handleSearch() {
 function handleReset() {
   searchForm.orderNo = ''
   searchForm.supplierId = ''
+  searchForm.status = 'ALL'
   searchForm.dateRange = null
   pageNum.value = 1
   fetchData()

@@ -14,7 +14,7 @@
           />
         </el-form-item>
         <el-form-item label="客户">
-          <el-select v-model="searchForm.customerId" placeholder="请选择客户" clearable>
+          <el-select v-model="searchForm.customerId" placeholder="请选择客户" clearable filterable @change="handleSearch">
             <el-option v-for="c in customerOptions" :key="c.id" :label="c.name" :value="c.id" />
           </el-select>
         </el-form-item>
@@ -36,6 +36,7 @@
     <!-- 表格区（服务端分页，合计为全部查询结果） -->
     <el-card>
       <el-table :data="tableData" border stripe show-summary :summary-method="getSummaries" v-loading="tableLoading">
+        <el-table-column type="index" label="序号" width="60" :index="i => (pageNum - 1) * pageSize + i + 1" />
         <el-table-column prop="saleDate" label="销售日期" />
         <el-table-column prop="orderNo" label="销售单号" />
         <el-table-column prop="customerName" label="客户名称" />
@@ -149,6 +150,10 @@ function getSummaries(param) {
   const sums = []
   columns.forEach((column, index) => {
     if (index === 0) {
+      sums[index] = ''
+      return
+    }
+    if (index === 1) {
       sums[index] = '合计（全部查询结果）'
       return
     }

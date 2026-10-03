@@ -22,7 +22,7 @@
         <el-button type="primary" @click="handleAdd">新增</el-button>
       </div>
       <el-table :data="tableData" border stripe v-loading="tableLoading">
-        <el-table-column prop="id" label="ID" width="60" />
+        <el-table-column type="index" label="序号" width="60" :index="i => (pageNum - 1) * pageSize + i + 1" />
         <el-table-column prop="code" label="供应商编码" />
         <el-table-column prop="name" label="供应商名称" />
         <el-table-column prop="contact" label="联系人" />

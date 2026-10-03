@@ -29,6 +29,7 @@
         <el-button type="primary" @click="handleAdd">新增盘点单</el-button>
       </div>
       <el-table :data="tableData" border stripe v-loading="tableLoading">
+        <el-table-column type="index" label="序号" width="60" :index="i => (pageNum - 1) * pageSize + i + 1" />
         <el-table-column prop="checkNo" label="盘点单号" />
         <el-table-column prop="checkDate" label="盘点日期" />
         <el-table-column prop="remark" label="备注" />

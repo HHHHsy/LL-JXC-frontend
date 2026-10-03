@@ -35,7 +35,7 @@
     <!-- 表格区 -->
     <el-card>
       <el-table :data="tableData" border stripe v-loading="tableLoading">
-        <el-table-column prop="id" label="ID" width="60" />
+        <el-table-column type="index" label="序号" width="60" :index="i => (pageNum - 1) * pageSize + i + 1" />
         <el-table-column label="变动时间" width="170">
           <template #default="{ row }">{{ formatDateTime(row.changeTime) }}</template>
         </el-table-column>

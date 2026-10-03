@@ -7,7 +7,7 @@
           <el-input v-model="searchForm.orderNo" placeholder="订单编号" clearable />
         </el-form-item>
         <el-form-item label="客户">
-          <el-select v-model="searchForm.customerId" placeholder="请选择客户" clearable>
+          <el-select v-model="searchForm.customerId" placeholder="请选择客户" clearable filterable @change="handleSearch">
             <el-option v-for="c in customerOptions" :key="c.id" :label="c.name" :value="c.id" />
           </el-select>
         </el-form-item>
@@ -43,6 +43,7 @@
         <el-button type="primary" @click="handleAdd">新增</el-button>
       </div>
       <el-table :data="tableData" border stripe v-loading="tableLoading">
+        <el-table-column type="index" label="序号" width="60" :index="i => (pageNum - 1) * pageSize + i + 1" />
         <el-table-column prop="orderNo" label="订单编号" />
         <el-table-column prop="customerName" label="客户名称" />
         <el-table-column prop="saleDate" label="销售日期" />
